@@ -4,7 +4,7 @@ using Duende.IdentityServer.Models;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
-namespace IDP
+namespace IDP.Helpers
 {
     public class SeedData
     {

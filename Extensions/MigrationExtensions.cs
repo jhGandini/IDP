@@ -2,9 +2,9 @@
 using Duende.IdentityServer.EntityFramework.Mappers;
 using Microsoft.EntityFrameworkCore;
 
-namespace IDP
+namespace IDP.Extensions
 {
-    public static class MigrationManager
+    public static class MigrationExtensions
     {
         public static IServiceProvider MigrateDatabase(this IServiceProvider provider)
         {

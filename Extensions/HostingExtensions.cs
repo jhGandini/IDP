@@ -1,5 +1,4 @@
 using Duende.IdentityServer;
-using IDP;
 using IDP.Pages.Admin.ApiScopes;
 using IDP.Pages.Admin.Clients;
 using IDP.Pages.Admin.IdentityScopes;
@@ -7,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
-namespace IDP
+namespace IDP.Extensions
 {
     internal static class HostingExtensions
     {
@@ -16,7 +15,7 @@ namespace IDP
             builder.Services.AddRazorPages();
 
             //var migrationAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
-            var connectionString = builder.Configuration.GetConnectionString("sqlConnection");            
+            var connectionString = builder.Configuration.GetConnectionString("sqlConnection");
 
             var isBuilder = builder.Services
                 .AddIdentityServer(options =>
@@ -26,8 +25,8 @@ namespace IDP
                     options.Events.RaiseFailureEvents = true;
                     options.Events.RaiseSuccessEvents = true;
 
-                // see https://docs.duendesoftware.com/identityserver/v5/fundamentals/resources/
-                options.EmitStaticAudienceClaim = true;
+                    // see https://docs.duendesoftware.com/identityserver/v5/fundamentals/resources/
+                    options.EmitStaticAudienceClaim = true;
                 })
                 .AddTestUsers(Config.GetUsers())
                 // this adds the config data from DB (clients, resources, CORS)
@@ -45,8 +44,8 @@ namespace IDP
                     options.ConfigureDbContext = b =>
                         b.UseSqlServer(connectionString, dbOpts => dbOpts.MigrationsAssembly(typeof(Program).Assembly.FullName));
 
-                // this enables automatic token cleanup. this is optional.
-                options.EnableTokenCleanup = true;
+                    // this enables automatic token cleanup. this is optional.
+                    options.EnableTokenCleanup = true;
                     options.RemoveConsumedTokens = true;
                 });
 
@@ -86,7 +85,7 @@ namespace IDP
             //builder.Services.Configure<RazorPagesOptions>(options =>
             //    options.Conventions.AuthorizeFolder("/ServerSideSessions", "admin"));
 
-            
+
             return builder.Build();
         }
 

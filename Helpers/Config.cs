@@ -3,7 +3,7 @@ using Duende.IdentityServer.Models;
 using Duende.IdentityServer.Test;
 using System.Security.Claims;
 
-namespace IDP
+namespace IDP.Helpers
 {
     public static class Config
     {

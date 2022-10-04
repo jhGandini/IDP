@@ -64,7 +64,7 @@ namespace IDP.Pages.Admin.Clients
 
         public async Task<IEnumerable<ClientSummaryModel>> GetAllAsync(string filter = null)
         {
-            var grants = new[] { GrantType.AuthorizationCode, GrantType.ClientCredentials };
+            var grants = new[] { GrantType.AuthorizationCode, GrantType.ClientCredentials, GrantType.DeviceFlow, GrantType.Hybrid, GrantType.Implicit, GrantType.ResourceOwnerPassword };
 
             var query = _context.Clients
                 .Include(x => x.AllowedGrantTypes)

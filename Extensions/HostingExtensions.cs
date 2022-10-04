@@ -1,9 +1,13 @@
 using Duende.IdentityServer;
+using IDP.Data;
+using IDP.Helpers;
 using IDP.Pages.Admin.ApiScopes;
 using IDP.Pages.Admin.Clients;
 using IDP.Pages.Admin.IdentityScopes;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Serilog;
 
 namespace IDP.Extensions
@@ -12,10 +16,22 @@ namespace IDP.Extensions
     {
         public static WebApplication ConfigureServices(this WebApplicationBuilder builder)
         {
-            builder.Services.AddRazorPages();
-
             //var migrationAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
             var connectionString = builder.Configuration.GetConnectionString("sqlConnection");
+
+            builder.Services.AddDbContext<ApplicationDbContext>(options =>
+                    options.UseSqlServer(connectionString, dbOpts => dbOpts.MigrationsAssembly(typeof(Program).Assembly.FullName))
+                );
+            builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+            builder.Services.AddIdentity<IdentityUser, IdentityRole>(options => 
+                { 
+                    options.SignIn.RequireConfirmedAccount = false;                    
+                })
+                .AddEntityFrameworkStores<ApplicationDbContext>();
+            //builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            //    .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            builder.Services.AddRazorPages();
 
             var isBuilder = builder.Services
                 .AddIdentityServer(options =>
@@ -28,7 +44,8 @@ namespace IDP.Extensions
                     // see https://docs.duendesoftware.com/identityserver/v5/fundamentals/resources/
                     options.EmitStaticAudienceClaim = true;
                 })
-                .AddTestUsers(Config.GetUsers())
+                //.AddTestUsers(Config.GetUsers())
+                .AddAspNetIdentity<IdentityUser>()
                 // this adds the config data from DB (clients, resources, CORS)
                 .AddConfigurationStore(options =>
                 {
@@ -66,7 +83,7 @@ namespace IDP.Extensions
             {
                 builder.Services.AddAuthorization(options =>
                     options.AddPolicy("admin",
-                        policy => policy.RequireClaim("sub", "a9ea0f25-b964-409f-bcce-c923266249b4"))
+                        policy => policy.RequireClaim("sub", "4b9530d5-20ec-497f-8d49-6c7d07ca83a0"))
                 );
 
                 builder.Services.Configure<RazorPagesOptions>(options =>
@@ -96,15 +113,22 @@ namespace IDP.Extensions
             if (app.Environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseMigrationsEndPoint();
             }
 
             app.UseStaticFiles();
             app.UseRouting();
+
             app.UseIdentityServer();
             app.UseAuthorization();
 
-            app.MapRazorPages()
-                .RequireAuthorization();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapRazorPages().RequireAuthorization();
+            });
+
+            //app.MapRazorPages()
+                
 
             return app;
         }

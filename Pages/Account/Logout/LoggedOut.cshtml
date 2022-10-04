@@ -7,7 +7,7 @@
         <small>You are now logged out</small>
     </h1>
 
-    @if (Model.View.PostLogoutRedirectUri != null)
+    @*@if (Model.View.PostLogoutRedirectUri != null)
     {
         <div>
             Click <a class="PostLogoutRedirectUri" href="@Model.View.PostLogoutRedirectUri">here</a> to return to the
@@ -18,13 +18,38 @@
     @if (Model.View.SignOutIframeUrl != null)
     {
         <iframe width="0" height="0" class="signout" src="@Model.View.SignOutIframeUrl"></iframe>
+    }*@
+
+    @{
+        if (!Model._LoggedOut)
+        {
+            <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-logoutId="@Request.Query["logoutId"]" method="post">
+                <button type="submit" class="nav-link btn btn-link text-dark">Click here to Logout</button>
+            </form>
+        }
+        else
+        {
+            <p>You have successfully logged out of the application.</p>
+
+            @if (Model.PostLogoutRedirectUri != null)
+            {
+                <div>
+                    Click <a class="PostLogoutRedirectUri" href="@Model.PostLogoutRedirectUri">here</a> to return to the application.
+                </div>
+            }
+
+            @if (Model.SignOutIframeUrl != null)
+            {
+                <iframe width="0" height="0" style="display:none" class="signout" src="@Model.SignOutIframeUrl"></iframe>
+            }
+        }
     }
 </div>
-
+@*
 @section scripts
 {
     @if (Model.View.AutomaticRedirectAfterSignOut)
     {
         <script src="~/js/signout-redirect.js"></script>
     }
-}
+}*@
